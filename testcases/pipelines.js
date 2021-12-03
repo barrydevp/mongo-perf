@@ -378,8 +378,7 @@ function topBottomDocGenerator(groupSize,direction, i) {
  */
 function topBottomTestCaseGenerator(name, op, direction, groupSize, nDocs, n = undefined) {
     generateTestCase({
-        name: "Group.GroupsWith" + name +  (n ? "WithNVal" + n : "") +
-            "AndGroupsOfSize" + groupSize + "And" + nDocs + "Docs",
+        name: "Group.GroupsWith" + name +  (n ? "WithNVal" + n : "") + "AndGroupsOfSize" + groupSize,
         tags: ['>=5.2.0'],
         nDocs: nDocs,
         docGenerator: (i) => topBottomDocGenerator(groupSize, direction, i),
@@ -391,8 +390,11 @@ function topBottomTestCaseGenerator(name, op, direction, groupSize, nDocs, n = u
 }
 
 /**
- * Generate each test case for a variable number of documents. This is useful for $group and
- * $setWindowFields as the work done by each stage is proportional to the number of input documents.
+ * Generate each test case for different group sizes and values of 'n'. In particular, we test
+ * group sizes of 100 and 250, and n values of 10 and 50 (the number of documents stays constant
+ * at 10k). As such, the set of case we generate for each test is the cross product of both
+ * dimensions: {groupSize: 100, n: 10}, {groupSize: 100, n: 50}, {groupSize: 250, n: 10},
+ * {groupSize: 250, n: 50}.
  */
 for (const groupSize of [100, 250]) {
     const nDocs = 10 * 1000;
@@ -403,14 +405,15 @@ for (const groupSize of [100, 250]) {
          */
         generateTestCase(
             {
-                name: "Group.GamesSortIndexedFirst" + n + "With" + nDocs + "DocsAndGroupsOfSize" + groupSize,
+                name: "Group.GamesSortIndexedFirst" + n + "WithGroupsOfSize" + groupSize,
                 tags: ['>=5.2.0'],
                 nDocs: nDocs,
                 indices: [{game: 1, score: -1}],
                 docGenerator: (i) => gameScoreGenerator(groupSize, i),
                 pipeline: [{$sort: {game: 1}}, {
                     $group: {
-                        _id: "$game", leaderBoard: {
+                        _id: "$game",
+                        leaderBoard: {
                             $firstN: {
                                 n: n,
                                 input: {
@@ -428,13 +431,14 @@ for (const groupSize of [100, 250]) {
          */
         generateTestCase(
             {
-                name: "Group.GamesTop" + n + "With" + nDocs + "DocsAndGroupsOfSize" + groupSize,
+                name: "Group.GamesUnindexedTop" + n + "WithGroupsOfSize" + groupSize,
                 tags: ['>=5.2.0'],
                 nDocs: nDocs,
                 docGenerator: (i) => gameScoreGenerator(groupSize, i),
                 pipeline: [{
                     $group: {
-                        _id: "$game", leaderBoard: {
+                        _id: "$game",
+                        leaderBoard: {
                             $topN: {
                                 n: n,
                                 output: {
@@ -448,13 +452,12 @@ for (const groupSize of [100, 250]) {
             });
 
         /**
-         * Test case which splits 'nDocs' documents into groups containing 'groupSize'
-         * document and returns the minimum 'n' values in each group. Because the documents
-         * are in descending order, the number of comparisons and evictions performed is
-         * maximized.
+         * Test case which splits 'nDocs' documents into groups containing 'groupSize' documents
+         * and returns the minimum 'n' values in each group. Because the documents are in
+         * descending order, the number of comparisons and evictions performed is maximized.
          */
         generateTestCase({
-            name: "Group.Min" + n + "With" + nDocs + "DocsAndGroupsOfSize" + groupSize,
+            name: "Group.Min" + n + "WithAndGroupsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: (i) => minNDocGenerator(groupSize, i),
@@ -462,13 +465,12 @@ for (const groupSize of [100, 250]) {
         });
 
         /**
-         * Test case which splits 'nDocs' documents into groups containing 'groupSize'
-         * document and returns the maximum 'n' values in each group. Because the documents
-         * are in ascending order, the number of comparisons and evictions performed is
-         * maximized.
+         * Test case which splits 'nDocs' documents into groups containing 'groupSize' documents
+         * and returns the maximum 'n' values in each group. Because the documents are in ascending
+         * order, the number of comparisons and evictions performed is maximized.
          */
         generateTestCase({
-            name: "Group.Max" + n + "With" + nDocs + "DocsAndGroupsOfSize" + groupSize,
+            name: "Group.Max" + n + "WithGroupsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: (i) => maxNDocGenerator(groupSize, i),
@@ -483,13 +485,14 @@ for (const groupSize of [100, 250]) {
          * the current document, and the current document itself.
          */
         generateTestCase({
-            name: "SetWindowFields.Min" + n + "With" + nDocs + "DocsAndPartitionsOfSize" + groupSize,
+            name: "SetWindowFields.Min" + n + "WithPartitionsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: (i) => minNDocGenerator(groupSize, i),
             pipeline: [{
                 $setWindowFields: {
-                    sortBy: {_id: 1}, partitionBy: "$groupKey",
+                    sortBy: {_id: 1},
+                    partitionBy: "$groupKey",
                     output: {
                         minVals: {
                             $minN: {n: n, input: "$_id"},
@@ -508,13 +511,14 @@ for (const groupSize of [100, 250]) {
          * the current document, and the current document itself.
          */
         generateTestCase({
-            name: "SetWindowFields.Max" + n + "With" + nDocs + "DocsAndPartitionsOfSize" + groupSize,
+            name: "SetWindowFields.Max" + n + "WithPartitionsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: (i) => maxNDocGenerator(groupSize, i),
             pipeline: [{
                 $setWindowFields: {
-                    sortBy: {_id: 1}, partitionBy: "$groupKey",
+                    sortBy: {_id: 1},
+                    partitionBy: "$groupKey",
                     output: {
                         maxVals: {
                             $maxN: {n: n, input: "$_id"},
@@ -530,7 +534,7 @@ for (const groupSize of [100, 250]) {
          * first 'n' values in each group.
          */
         generateTestCase({
-            name: "Group.First" + n + "With" + nDocs + "DocsAndGroupsOfSize" + groupSize,
+            name: "Group.First" + n + "WithGroupsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function basicGroupDocGenerator(i) {
@@ -549,7 +553,7 @@ for (const groupSize of [100, 250]) {
          * last 'n' values in each group.
          */
         generateTestCase({
-            name: "Group.Last" + n + "With" + nDocs + "DocsAndGroupsOfSize" + groupSize,
+            name: "Group.Last" + n + "WithGroupsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function basicGroupDocGenerator(i) {
@@ -571,7 +575,7 @@ for (const groupSize of [100, 250]) {
          * the current document, and the current document itself.
          */
         generateTestCase({
-            name: "SetWindowFields.First" + n + "With" + nDocs + "DocsAndPartitionsOfSize" + groupSize,
+            name: "SetWindowFields.First" + n + "WithPartitionsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function basicGroupDocGenerator(i) {
@@ -579,7 +583,8 @@ for (const groupSize of [100, 250]) {
             },
             pipeline: [{
                 $setWindowFields: {
-                    sortBy: {_id: 1}, partitionBy: "$groupKey",
+                    sortBy: {_id: 1},
+                    partitionBy: "$groupKey",
                     output: {
                         firstVals: {
                             $firstN: {n: n, input: "$_id"},
@@ -598,7 +603,7 @@ for (const groupSize of [100, 250]) {
          * documents after the current document, and the current document itself.
          */
         generateTestCase({
-            name: "SetWindowFields.Last" + n + "With" + nDocs + "DocsAndPartitionsOfSize" + groupSize,
+            name: "SetWindowFields.Last" + n + "WithPartitionsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function basicGroupDocGenerator(i) {
@@ -606,7 +611,8 @@ for (const groupSize of [100, 250]) {
             },
             pipeline: [{
                 $setWindowFields: {
-                    sortBy: {_id: 1}, partitionBy: "$groupKey",
+                    sortBy: {_id: 1},
+                    partitionBy: "$groupKey",
                     output: {
                         lastVals: {
                             $lastN: {n: n, input: "$_id"},
@@ -678,7 +684,7 @@ for(const arrSize of [50, 250, 500]) {
          * whose 'arrSize' elements are in descending order.
          */
         generateTestCase({
-            name: "Project.Min" + n + "WithArraysOfSize" + arrSize + "Over" + nDocs + "Docs",
+            name: "Project.Min" + n + "WithArraysOfSize" + arrSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function generator(i) {
@@ -692,7 +698,7 @@ for(const arrSize of [50, 250, 500]) {
          * elements are in ascending order.
          */
         generateTestCase({
-            name: "Project.Max" + n + "WithArraysOfSize" + arrSize + "Over" + nDocs + "Docs",
+            name: "Project.Max" + n + "WithArraysOfSize" + arrSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function generator(i) {
@@ -706,7 +712,7 @@ for(const arrSize of [50, 250, 500]) {
          * 'arrSize' elements.
          */
         generateTestCase({
-            name: "Project.First" + n + "WithArraysOfSize" + arrSize + "Over" + nDocs + "Docs",
+            name: "Project.First" + n + "WithArraysOfSize" + arrSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function generator(i) {
@@ -720,7 +726,7 @@ for(const arrSize of [50, 250, 500]) {
          * 'arrSize' elements.
          */
         generateTestCase({
-            name: "Project.Last" + n + "WithArraysOfSize" + arrSize + "Over" + nDocs + "Docs",
+            name: "Project.Last" + n + "WithArraysOfSize" + arrSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: function generator(i) {
