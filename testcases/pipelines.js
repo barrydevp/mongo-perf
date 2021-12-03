@@ -2444,26 +2444,27 @@ generateTestCaseWithLargeDatasetAndIndexes({
 });
 
 /**
- * Generates an array of 'numElements' elements to be used for testing the performance of
+ * Generates an array of 'numElements' elements to be used for testing the performance of the
  * $sortArray aggregation expression. Depending on the sort direction, we specifically generate
- * the array with elements in descending order or ascending order to maximizes the number of
+ * the array with elements in descending order or ascending order to maximize the number of
  * comparisons made during expression evaluation to sort the underlying array.
  *
  * @param {Number} numElements: size of the array to generate and later sort.
  * @param {Boolean} isDescending: true if we're generating an array in descending order.
- * @param {String} variant: controls what data the array holds - either 'numbers', 'strings',
- * or 'objects'.
+ * @param {String} variant: controls what type of data the array holds - either 'numbers', 
+ * 'strings', or 'objects'.
  */
  function generateArrayForSortArray(numElements, isDescending, variant){
     let arr = [];
     for(let idx = 0; idx < numElements; ++idx){
+        let arrVal = isDescending ? -idx : idx;
         if (variant === "numbers") {
-            arr.push(isDescending ? -idx : idx);
+            arr.push(arrVal);
         } else if (variant === "strings") {
-            arr.push(isDescending ? (-idx).toString() : idx.toString());
+            arr.push(arrVal.toString());
         } else if (variant === "objects") {
             arr.push({
-                a: { b: { c: isDescending ? -idx : idx } }
+                a: { b: { c: arrVal } }
             });
         }
     }
@@ -2496,7 +2497,7 @@ function buildSortArrayTestCaseName(base, numElements, direction) {
     // are looking to sort in ascending order (1).
     const shouldGenerateArrayInDescOrder = direction === 1;
 
-    [1, 10, 100, 1000].forEach(numElements => {
+    [10, 100, 1000].forEach(numElements => {
         generateTestCase({
             name: buildSortArrayTestCaseName("Project.SortArray", numElements, direction),
             tags: ['>=5.2.0'],
