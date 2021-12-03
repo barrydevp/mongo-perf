@@ -457,7 +457,7 @@ for (const groupSize of [100, 250]) {
          * descending order, the number of comparisons and evictions performed is maximized.
          */
         generateTestCase({
-            name: "Group.Min" + n + "WithAndGroupsOfSize" + groupSize,
+            name: "Group.Min" + n + "WithGroupsOfSize" + groupSize,
             tags: ['>=5.2.0'],
             nDocs: nDocs,
             docGenerator: (i) => minNDocGenerator(groupSize, i),
@@ -596,8 +596,8 @@ for (const groupSize of [100, 250]) {
         });
 
         /**
-         * Test case which splits 'nDocs' documents into 10 partitions of 'groupSize'
-         * documents. For each document within the partition, we take the last 10 documents
+         * Test case which splits 'nDocs' documents into partitions of 'groupSize' documents.
+         * For each document within the partition, we take the last 10 documents
          * over a sliding window of at least 10 documents and up to 21 documents. This
          * window consists of the 10 documents before the current document, the 10
          * documents after the current document, and the current document itself.
@@ -680,7 +680,7 @@ for(const arrSize of [50, 250, 500]) {
     for(const n of [10, 50]) {
         const nDocs = 1000;
         /**
-         * Test case which, for each document, evaluates taking the minimum 10 values of an array
+         * Test case which, for each document, evaluates taking the minimum 'n'' values of an array
          * whose 'arrSize' elements are in descending order.
          */
         generateTestCase({
@@ -694,8 +694,8 @@ for(const arrSize of [50, 250, 500]) {
         });
 
         /**
-         * Test case which, for each document, evaluates taking the maximum 10 values of an array whose 50
-         * elements are in ascending order.
+         * Test case which, for each document, evaluates taking the maximum 'n' values of an array
+         * whose 'arrSize' elements are in ascending order.
          */
         generateTestCase({
             name: "Project.Max" + n + "WithArraysOfSize" + arrSize,
@@ -708,7 +708,7 @@ for(const arrSize of [50, 250, 500]) {
         });
 
         /**
-         * Test case which, for each document, evaluates taking the first 10 values of an array of
+         * Test case which, for each document, evaluates taking the first 'n' values of an array of
          * 'arrSize' elements.
          */
         generateTestCase({
@@ -722,7 +722,7 @@ for(const arrSize of [50, 250, 500]) {
         });
 
         /**
-         * Test case which, for each document, evaluates taking the last 10 values of an array of
+         * Test case which, for each document, evaluates taking the last 'n' values of an array of
          * 'arrSize' elements.
          */
         generateTestCase({
