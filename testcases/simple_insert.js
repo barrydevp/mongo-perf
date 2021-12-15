@@ -12,7 +12,9 @@ if ( typeof(tests) != "object" ) {
  */
 tests.push( { name: "Insert.Empty",
               tags: ['insert','regression'],
-              pre: function( collection ) { collection.drop(); },
+              pre: function( collection ) {
+    // collection.drop();
+    },
               ops: [
                   { op:  "insert",
                     doc: {} }
@@ -28,7 +30,7 @@ tests.push( { name: "Insert.Empty",
 tests.push( { name: "Insert.EmptyCapped",
               tags: ['insert','regression', 'capped'],
               pre: function( collection ) {
-                  collection.drop();
+                  // collection.drop();
                   collection.runCommand( "create", { capped : true,
                                                      size : 32 * 1024 } );
               },
@@ -47,7 +49,7 @@ tests.push( { name: "Insert.EmptyCapped",
 tests.push( { name: "Insert.EmptyCapped.SeqIntID",
               tags: ['insert','regression', 'capped'],
               pre: function( collection ) {
-                  collection.drop();
+                  // collection.drop();
                   collection.runCommand( "create", { capped : true,
                                                      size : 32 * 1024 } );
               },
@@ -68,7 +70,9 @@ tests.push( { name: "Insert.EmptyCapped.SeqIntID",
  */
 tests.push( { name: "Insert.JustID",
               tags: ['insert','core'],
-              pre: function( collection ) { collection.drop(); },
+              pre: function( collection ) {
+    // collection.drop();
+    },
               ops: [
                   { op:  "insert",
                     doc: { _id: { "#OID": 1 } } }
@@ -91,7 +95,9 @@ for (var i = 0; i < batchSize; i++) {
  */
 tests.push( { name: "Insert.IntVector",
               tags: ['insert','regression'],
-              pre: function( collection ) { collection.drop(); },
+              pre: function( collection ) {
+    // collection.drop();
+    },
               ops: [
                   { op:  "insert",
                     doc: docs }
@@ -131,7 +137,7 @@ for (var i = 0; i < batchSize; i++) {
 tests.push( { name: "Insert.SeqIntID.Indexed",
               tags: ['insert','indexed','regression'],
               pre: function( collection ) {
-                  collection.drop();
+                  // collection.drop();
                   collection.createIndex({a: 1});
               },
               ops: [
@@ -151,7 +157,9 @@ tests.push( { name: "Insert.SeqIntID.Indexed",
 */
 tests.push( { name: "Insert.IntIDUpsert",
               tags: ['insert','regression'],
-              pre: function( collection ) { collection.drop(); },
+              pre: function( collection ) {
+    // collection.drop();
+    },
               ops: [
                   { op:  "update",
                     upsert : true,
@@ -169,7 +177,9 @@ tests.push( { name: "Insert.IntIDUpsert",
 */
 tests.push( { name: "Insert.JustNum",
               tags: ['insert','regression'],
-              pre: function( collection ) { collection.drop(); },
+              pre: function( collection ) {
+    // collection.drop();
+    },
               ops: [
                   { op:  "insert",
                     doc:
@@ -190,7 +200,7 @@ tests.push( { name: "Insert.JustNum",
 tests.push( { name: "Insert.JustNumIndexed",
               tags: ['insert','indexed','regression'],
               pre: function( collection ) {
-                  collection.drop();
+                  // collection.drop();
                   collection.createIndex({x: 1});
               },
               ops: [
@@ -210,7 +220,7 @@ tests.push( { name: "InsertIndexedStringsSimpleCollation",
               pre: function( collection ) {
                   var testDB = collection.getDB();
                   var collName = collection.getName();
-                  collection.drop();
+                  // collection.drop();
                   testDB.createCollection(collName, { collation: { locale: "simple" } } );
                   collection.createIndex( { a: 1 } );
               },
@@ -232,7 +242,7 @@ tests.push( { name: "InsertIndexedStringsNonSimpleCollation",
               pre: function( collection ) {
                   var testDB = collection.getDB();
                   var collName = collection.getName();
-                  collection.drop();
+                  // collection.drop();
                   var myCollation = {
                       locale : "en",
                       strength : 5,
@@ -258,7 +268,7 @@ tests.push( { name: "Insert.UniqueIndex",
               pre: function( collection ) {
 	          var testDB = collection.getDB();
                   var collName = collection.getName();
-                  collection.drop();
+                  // collection.drop();
 		  testDB.createCollection( collName );
                   collection.createIndex( { a: 1 }, { unique: true } );
               },
@@ -281,7 +291,7 @@ tests.push( { name: "Insert.UniqueIndexCompound",
               pre: function( collection ) {
 	          var testDB = collection.getDB();
                   var collName = collection.getName();
-                  collection.drop();
+                  // collection.drop();
 		  testDB.createCollection( collName );
                   collection.createIndex( { a: 1, b: 1 }, { unique: true } );
               },
@@ -307,7 +317,7 @@ tests.push( { name: "Insert.UniqueIndexCompoundReverse",
               pre: function( collection ) {
 	          var testDB = collection.getDB();
                   var collName = collection.getName();
-                  collection.drop();
+                  // collection.drop();
 		  testDB.createCollection( collName );
                   collection.createIndex( { a: 1, b: -1 }, { unique: true } );
               },
@@ -328,7 +338,10 @@ tests.push( { name: "Insert.UniqueIndexCompoundReverse",
  */
 tests.push( { name: "Insert.LargeDocVector",
               tags: ['insert','regression'],
-              pre: function( collection ) { collection.drop(); },
+              pre: function( collection ) {
+                  // collection.drop();
+                  collection.createIndex( { fieldName: 1 } );
+              },
               ops: [
                   { op:  "insert",
                     doc: docs }
