@@ -237,7 +237,7 @@ def main():
 
             mongo_proc = subprocess.Popen([args.shellpath, "--norc", "--quiet", js_file.name,
                                            "--host", args.hostname, "--port", args.port] + auth,
-                                          stdout=PIPE)
+                                          stdout=outfile)
             mongo_procs = mongo_procs + [mongo_proc]
 
         for i in range(0, 10):
