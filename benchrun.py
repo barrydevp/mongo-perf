@@ -7,16 +7,18 @@ import sys
 import json
 import urllib2
 import os
-
+import subprocess
 
 
 class MongoShellCommandError(Exception):
     """ Raised when the mongo shell comes back with an unexpected error
     """
 
+
 def parse_arguments():
     usage = "python benchrun.py -f <list of test files> -t <list of thread counts>\n       run with --help for argument descriptions"
-    parser = ArgumentParser(description="mongo-perf micro-benchmark utility", usage=usage, formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(description="mongo-perf micro-benchmark utility", usage=usage,
+                            formatter_class=RawTextHelpFormatter)
 
     parser.add_argument('-f', '--testfiles', dest='testfiles', nargs="+",
                         help='Provide a list of js test files to run',
@@ -75,38 +77,38 @@ def parse_arguments():
 
     parser.add_argument('--includeFilter', dest='includeFilter', nargs='+', action="append",
                         help="Run just the specified tests/suites. Can specify multiple tags per --includeFilter\n"
-                        "flag. All tests/suites matching any of the tags will be run.\n"
-                        "Can specify multiple --includeFilter flags on the command line. A test\n"
-                        "must match all the --includeFilter clauses in order to be run.\n\n"
-                        "Ex 1: --includeFilter insert remove  --includeFilter core \n"
-                        "       will run all tests tagged with (\"insert\" OR \"remove\") AND (\"core\").\n"
-                        "Ex 2: --includeFilter %%\n"
-                        "       will run all tests",
+                             "flag. All tests/suites matching any of the tags will be run.\n"
+                             "Can specify multiple --includeFilter flags on the command line. A test\n"
+                             "must match all the --includeFilter clauses in order to be run.\n\n"
+                             "Ex 1: --includeFilter insert remove  --includeFilter core \n"
+                             "       will run all tests tagged with (\"insert\" OR \"remove\") AND (\"core\").\n"
+                             "Ex 2: --includeFilter %%\n"
+                             "       will run all tests",
                         default=[])
     parser.add_argument('--excludeFilter', dest='excludeFilter', nargs='+', action="append",
                         help="Exclude tests matching all of the tags included.\n"
-                        "Can specify multiple --excludeFilter flags on the command line. A test\n"
-                        "matching any --excludeFilter clauses will not be run.\n"
-                        "A test that is both included according to --includeFilter and excluded by --excludeFilter,\n"
-                        "will not be run.\n\n"
-                        "Ex: --excludeFilter slow old --excludeFilter broken \n"
-                        "     will exclude all tests tagged with (\"slow\" AND \"old\") OR (\"broken\").",
+                             "Can specify multiple --excludeFilter flags on the command line. A test\n"
+                             "matching any --excludeFilter clauses will not be run.\n"
+                             "A test that is both included according to --includeFilter and excluded by --excludeFilter,\n"
+                             "will not be run.\n\n"
+                             "Ex: --excludeFilter slow old --excludeFilter broken \n"
+                             "     will exclude all tests tagged with (\"slow\" AND \"old\") OR (\"broken\").",
                         default=[])
     parser.add_argument('--out', dest='outfile',
                         help='write the results as json to the specified file')
     parser.add_argument('--exclude-testbed', dest='excludeTestbed', nargs='?', const='true',
-                        choices=['true','false'], default='false',
+                        choices=['true', 'false'], default='false',
                         help='Exclude testbed information from results file')
     parser.add_argument('--printArgs', dest='printArgs', nargs='?', const='true',
-                        choices=['true','false'], default='false',
+                        choices=['true', 'false'], default='false',
                         help='Print the benchrun args before running the test.')
     parser.add_argument('--generateMongoeBenchConfigFiles', dest='mongoebench_config_dir',
                         help='Changes the behavior of this script to write JSON config files\n'
-                        'equivalent to the operations performed in the list of specified JS test\n'
-                        'files without actually running the test cases. A mongod process must\n'
-                        'still be running while the JSON config files are being generated.')
+                             'equivalent to the operations performed in the list of specified JS test\n'
+                             'files without actually running the test cases. A mongod process must\n'
+                             'still be running while the JSON config files are being generated.')
     parser.add_argument('--shareDataset', dest='shareDataset', nargs='?', const='true',
-                        choices=['true','false'], default='false',
+                        choices=['true', 'false'], default='false',
                         help='Share the dataset, created by the first test with all following tests/trials.')
     return parser
 
@@ -151,11 +153,11 @@ def main():
         print("Warning: You specified one of username or password, but not the other.")
         print("         Benchrun will continue without authentication.")
 
-    if args.includeFilter == [] :
+    if args.includeFilter == []:
         args.includeFilter = '%'
-    elif len(args.includeFilter) == 1 :
+    elif len(args.includeFilter) == 1:
         args.includeFilter = args.includeFilter[0]
-        if args.includeFilter == ['%'] :
+        if args.includeFilter == ['%']:
             args.includeFilter = '%'
 
     if args.username:
@@ -164,9 +166,9 @@ def main():
         auth = []
 
     check_call([args.shellpath, "--norc",
-          "--host", args.hostname, "--port", args.port,
-          "--eval", "print('db version: ' + db.version());"
-          " db.serverBuildInfo().gitVersion;"] + auth)
+                "--host", args.hostname, "--port", args.port,
+                "--eval", "print('db version: ' + db.version());"
+                          " db.serverBuildInfo().gitVersion;"] + auth)
     print("")
 
     commands = []
@@ -181,9 +183,9 @@ def main():
     crud_options = {}
     crud_options["writeConcern"] = {}
     if (args.j):
-            crud_options["writeConcern"]["j"] = args.j
+        crud_options["writeConcern"]["j"] = args.j
     if (args.w):
-            crud_options["writeConcern"]["w"] = args.w
+        crud_options["writeConcern"]["w"] = args.w
     crud_options["writeCmdMode"] = args.writeCmd
     crud_options["readCmdMode"] = args.readCmd
 
@@ -203,21 +205,21 @@ def main():
         authstr = ", '" + args.username + "', '" + args.password + "'"
 
     commands.append("mongoPerfRunTests(" +
-              str(args.threads) + ", " +
-              str(args.multidb) + ", " +
-              str(args.multicoll) + ", " +
-              str(args.seconds) + ", " +
-              str(args.trials) + ", " +
-              str(json.dumps(args.includeFilter)) + ", " +
-              str(json.dumps(args.excludeFilter)) + ", " +
-              str(args.shard) + ", " +
-              str(json.dumps(crud_options)) + ", " +
-              str(args.excludeTestbed) + ", " +
-              str(args.printArgs) + ", " +
-              str(args.shareDataset) + ", " +
-              str(json.dumps(mongoebench_options)) +
-              authstr +
-              ");")
+                    str(args.threads) + ", " +
+                    str(args.multidb) + ", " +
+                    str(args.multicoll) + ", " +
+                    str(args.seconds) + ", " +
+                    str(args.trials) + ", " +
+                    str(json.dumps(args.includeFilter)) + ", " +
+                    str(json.dumps(args.excludeFilter)) + ", " +
+                    str(args.shard) + ", " +
+                    str(json.dumps(crud_options)) + ", " +
+                    str(args.excludeTestbed) + ", " +
+                    str(args.printArgs) + ", " +
+                    str(args.shareDataset) + ", " +
+                    str(json.dumps(mongoebench_options)) +
+                    authstr +
+                    ");")
 
     commands = '\n'.join(commands)
     print commands
@@ -226,35 +228,46 @@ def main():
         js_file.write(commands)
         js_file.flush()
 
+        mongo_procs = []
+        outfiles = []
         # Open a mongo shell subprocess and load necessary files.
-        mongo_proc = Popen([args.shellpath, "--norc", "--quiet", js_file.name,
-                           "--host", args.hostname, "--port", args.port] + auth,
-                           stdout=PIPE)
+        for i in range(0, 10):
+            outfile = open('out_%d' % i, 'w')
+            outfiles = outfiles + [outfile]
+
+            mongo_proc = subprocess.Popen([args.shellpath, "--norc", "--quiet", js_file.name,
+                                           "--host", args.hostname, "--port", args.port] + auth,
+                                          stdout=PIPE)
+            mongo_procs = mongo_procs + [mongo_proc]
+
+        for i in range(0, 10):
+            mongo_procs[i].wait()
+            outfiles[i].close()
 
         # Read test output.
-        readout = False
-        getting_results = False
-        got_results = False
-        line_results = ""
-        for line in iter(mongo_proc.stdout.readline, ''):
-            line = line.strip()
-            if line == "@@@START@@@":
-                readout = True
-                getting_results = False
-            elif line == "@@@END@@@":
-                readout = False
-                getting_results = False
-            elif line == "@@@RESULTS_START@@@":
-                readout = False
-                getting_results = True
-            elif line == "@@@RESULTS_END@@@":
-                readout = False
-                got_results = True
-                getting_results = False
-            elif readout:
-                print line
-            elif not got_results and getting_results:
-                line_results += line
+        # readout = False
+        # getting_results = False
+        # got_results = False
+        # line_results = ""
+        # for line in iter(mongo_proc.stdout.readline, ''):
+        #     line = line.strip()
+        #     if line == "@@@START@@@":
+        #         readout = True
+        #         getting_results = False
+        #     elif line == "@@@END@@@":
+        #         readout = False
+        #         getting_results = False
+        #     elif line == "@@@RESULTS_START@@@":
+        #         readout = False
+        #         getting_results = True
+        #     elif line == "@@@RESULTS_END@@@":
+        #         readout = False
+        #         got_results = True
+        #         getting_results = False
+        #     elif readout:
+        #         print line
+        #     elif not got_results and getting_results:
+        #         line_results += line
 
     print("Finished Testing.")
     results_parsed = json.loads(line_results)
@@ -265,6 +278,7 @@ def main():
     else:
         print json.dumps(results_parsed, indent=4, separators=(',', ': '))
 
+
 if __name__ == '__main__':
     try:
         main()
@@ -272,4 +286,3 @@ if __name__ == '__main__':
         sys.stderr.write('Error: %s\n' % e)
         sys.exit(1)
     sys.exit(0)
-
