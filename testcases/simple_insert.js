@@ -1,6 +1,7 @@
 if ( typeof(tests) != "object" ) {
     tests = [];
 }
+let tests_1 = [];
 
 /*
  * Setup:
@@ -10,7 +11,7 @@ if ( typeof(tests) != "object" ) {
  *            the index on _id will continually add entries larger than
  *            any current entry.
  */
-tests.push( { name: "Insert.Empty",
+tests_1.push( { name: "Insert.Empty",
               tags: ['insert','regression'],
               pre: function( collection ) {
     // collection.drop();
@@ -27,7 +28,7 @@ tests.push( { name: "Insert.Empty",
  * Notes: Empty document with _id : ObjectID is 48 bytes from measurement.
  *        Need at least 683 inserts to roll the capped collection.
  */
-tests.push( { name: "Insert.EmptyCapped",
+tests_1.push( { name: "Insert.EmptyCapped",
               tags: ['insert','regression', 'capped'],
               pre: function( collection ) {
                   // collection.drop();
@@ -46,7 +47,7 @@ tests.push( { name: "Insert.EmptyCapped",
  * Notes: Empty document with _id : NumberInt is 16 bytes from measurement. Need
  *            at least 2048 inserts to roll the capped collection.
  */
-tests.push( { name: "Insert.EmptyCapped.SeqIntID",
+tests_1.push( { name: "Insert.EmptyCapped.SeqIntID",
               tags: ['insert','regression', 'capped'],
               pre: function( collection ) {
                   // collection.drop();
@@ -68,7 +69,7 @@ tests.push( { name: "Insert.EmptyCapped.SeqIntID",
  * Notes: Generates the _id field on the client
  *        
  */
-tests.push( { name: "Insert.JustID",
+tests_1.push( { name: "Insert.JustID",
               tags: ['insert','core'],
               pre: function( collection ) {
     // collection.drop();
@@ -93,7 +94,7 @@ for (var i = 0; i < batchSize; i++) {
  * Notes: Generates the _id field on the client
  *        
  */
-tests.push( { name: "Insert.IntVector",
+tests_1.push( { name: "Insert.IntVector",
               tags: ['insert','regression'],
               pre: function( collection ) {
     // collection.drop();
@@ -134,7 +135,7 @@ for (var i = 0; i < batchSize; i++) {
  *            tests each thread will insert sequential ints in different
  *            ranges, and will exercise different ranges of the _id index.
 */
-tests.push( { name: "Insert.SeqIntID.Indexed",
+tests_1.push( { name: "Insert.SeqIntID.Indexed",
               tags: ['insert','indexed','regression'],
               pre: function( collection ) {
                   // collection.drop();
@@ -155,7 +156,7 @@ tests.push( { name: "Insert.SeqIntID.Indexed",
  *            tests each thread will insert sequential ints in different
  *            ranges, and will exercise different ranges of the _id index.
 */
-tests.push( { name: "Insert.IntIDUpsert",
+tests_1.push( { name: "Insert.IntIDUpsert",
               tags: ['insert','regression'],
               pre: function( collection ) {
     // collection.drop();
@@ -175,7 +176,7 @@ tests.push( { name: "Insert.IntIDUpsert",
  *           sequential int for 'x' field.
  * Notes: Let mongod create missing _id field
 */
-tests.push( { name: "Insert.JustNum",
+tests_1.push( { name: "Insert.JustNum",
               tags: ['insert','regression'],
               pre: function( collection ) {
     // collection.drop();
@@ -197,7 +198,7 @@ tests.push( { name: "Insert.JustNum",
  *            tests each thread will insert sequential ints in different
  *            ranges, and will exercise different ranges of the 'x' index.
 */
-tests.push( { name: "Insert.JustNumIndexed",
+tests_1.push( { name: "Insert.JustNumIndexed",
               tags: ['insert','indexed','regression'],
               pre: function( collection ) {
                   // collection.drop();
@@ -215,7 +216,7 @@ tests.push( { name: "Insert.JustNumIndexed",
  *
  * Test: Repeatedly insert an indexed 10 character string.
  */
-tests.push( { name: "InsertIndexedStringsSimpleCollation",
+tests_1.push( { name: "InsertIndexedStringsSimpleCollation",
               tags: ['insert','indexed','regression','collation'],
               pre: function( collection ) {
                   var testDB = collection.getDB();
@@ -237,7 +238,7 @@ tests.push( { name: "InsertIndexedStringsSimpleCollation",
  * Comparing this test against InsertIndexedStringsSimpleCollation should indicate the overhead
  * associated with generating index keys for an index with a non-simple collation.
  */
-tests.push( { name: "InsertIndexedStringsNonSimpleCollation",
+tests_1.push( { name: "InsertIndexedStringsNonSimpleCollation",
               tags: ['insert','indexed','regression','collation'],
               pre: function( collection ) {
                   var testDB = collection.getDB();
@@ -263,7 +264,7 @@ tests.push( { name: "InsertIndexedStringsNonSimpleCollation",
  * Notes: Let mongod create missing _id field
  *
  */
-tests.push( { name: "Insert.UniqueIndex",
+tests_1.push( { name: "Insert.UniqueIndex",
               tags: ['insert','uniqueidx', 'regression'],
               pre: function( collection ) {
 	          var testDB = collection.getDB();
@@ -286,7 +287,7 @@ tests.push( { name: "Insert.UniqueIndex",
  * Notes: Let mongod create missing _id field
  *
  */
-tests.push( { name: "Insert.UniqueIndexCompound",
+tests_1.push( { name: "Insert.UniqueIndexCompound",
               tags: ['insert','uniqueidx','regression'],
               pre: function( collection ) {
 	          var testDB = collection.getDB();
@@ -312,7 +313,7 @@ tests.push( { name: "Insert.UniqueIndexCompound",
  * Notes: Let mongod create missing _id field
  *
  */
-tests.push( { name: "Insert.UniqueIndexCompoundReverse",
+tests_1.push( { name: "Insert.UniqueIndexCompoundReverse",
               tags: ['insert','uniqueidx','regression'],
               pre: function( collection ) {
 	          var testDB = collection.getDB();
