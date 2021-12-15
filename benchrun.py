@@ -110,6 +110,10 @@ def parse_arguments():
     parser.add_argument('--shareDataset', dest='shareDataset', nargs='?', const='true',
                         choices=['true', 'false'], default='false',
                         help='Share the dataset, created by the first test with all following tests/trials.')
+
+    parser.add_argument('--nproc', dest='nproc',
+                        help='number of running process',
+                        type=int, default=1)
     return parser
 
 
@@ -231,7 +235,7 @@ def main():
         mongo_procs = []
         outfiles = []
         # Open a mongo shell subprocess and load necessary files.
-        for i in range(0, 10):
+        for i in range(0, args.nproc):
             outfile = open('out_%d' % i, 'w')
             outfiles = outfiles + [outfile]
 
@@ -270,13 +274,13 @@ def main():
         #         line_results += line
 
     print("Finished Testing.")
-    results_parsed = json.loads(line_results)
-    if args.outfile:
-        out = open(args.outfile, 'w')
-        json.dump(results_parsed, out, indent=4, separators=(',', ': '))
-        out.close()
-    else:
-        print json.dumps(results_parsed, indent=4, separators=(',', ': '))
+    # results_parsed = json.loads(line_results)
+    # if args.outfile:
+    #     out = open(args.outfile, 'w')
+    #     json.dump(results_parsed, out, indent=4, separators=(',', ': '))
+    #     out.close()
+    # else:
+    #     print json.dumps(results_parsed, indent=4, separators=(',', ': '))
 
 
 if __name__ == '__main__':
