@@ -268,8 +268,6 @@ function initCollections(collections, env, testName, init, multidb, multicoll, s
     var startFrom = 0;
     for (var i = 0; i < multidb; i++) {
         var sibling_db = db.getSiblingDB('test' + i);
-        sibling_db.dropDatabase();
-        break;
         var foo = testName.replace(/\./g, "_");
         for (var j = 0; j < multicoll; j++) {
             var coll = sibling_db.getCollection(foo + j);
@@ -277,8 +275,6 @@ function initCollections(collections, env, testName, init, multidb, multicoll, s
             coll.drop();
         }
     }
-
-    return
 
     if (init) {
         for (var i = 0; i < (multidb * multicoll); i++) {
@@ -377,7 +373,6 @@ function runTest(
         initCollections(collections, env, test.name, test.pre, multidb, multicoll, shard);
     }
 
-    return { ops_per_sec: 0, error_count : 0};
     var new_ops = [];
 
     test.ops.forEach(function (z) {
