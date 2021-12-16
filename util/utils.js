@@ -265,8 +265,9 @@ function CommandTracer(testName, options) {
 
 var sharedCollections = [];
 function initCollections(collections, env, testName, init, multidb, multicoll, shard) {
+    var startFrom = 100;
     for (var i = 0; i < multidb; i++) {
-        var sibling_db = db.getSiblingDB('test' + i);
+        var sibling_db = db.getSiblingDB('test' + i + startFrom);
         var foo = testName.replace(/\./g, "_");
         for (var j = 0; j < multicoll; j++) {
             var coll = sibling_db.getCollection(foo + j);
