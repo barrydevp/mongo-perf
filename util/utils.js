@@ -97,7 +97,7 @@ function checkForDroppedCollectionsTestDBs(db, multidb){
         return;
     }
     for (var i = 0; i < multidb; i++) {
-        var sibling_db = db.getSiblingDB('test' + i);
+        var sibling_db = db.getSiblingDB('tenant' + i);
         var retries = 0;
         while (checkForDroppedCollections(sibling_db) && retries < 1000) {
             print("Sleeping 1 second while waiting for collection to finish dropping")
@@ -265,9 +265,8 @@ function CommandTracer(testName, options) {
 
 var sharedCollections = [];
 function initCollections(collections, env, testName, init, multidb, multicoll, shard) {
-    var startFrom = 0;
     for (var i = 0; i < multidb; i++) {
-        var sibling_db = db.getSiblingDB('test' + i);
+        var sibling_db = db.getSiblingDB('tenant' + i);
         var foo = testName.replace(/\./g, "_");
         for (var j = 0; j < multicoll; j++) {
             var coll = sibling_db.getCollection(foo + j);
@@ -286,7 +285,7 @@ function initCollections(collections, env, testName, init, multidb, multicoll, s
     // explicitly do so now. We want the collections to be pre-allocated so that allocation time is 
     // not incorporated into the benchmark.
     for (var i = 0; i < multidb; i++) {
-        var theDb = db.getSiblingDB('test' + i);
+        var theDb = db.getSiblingDB('tenant' + i);
         // This will silently fail and with no side-effects if the collection
         // already exists.
         for (var j = 0; j < multicoll; j++) {
@@ -299,16 +298,16 @@ function initCollections(collections, env, testName, init, multidb, multicoll, s
                 collections[(multicoll * i) + j].createIndex({ _id: "hashed" });
             }
 
-            sh.enableSharding("test" + i);
+            sh.enableSharding("tenant" + i);
             for (var j = 0; j < multicoll; j++) {
-                var t = sh.shardCollection("test" + i + "." +
+                var t = sh.shardCollection("tenant" + i + "." +
                     collections[(multicoll * i) + j].getName(), { _id: "hashed" });
             }
 
         } else if (shard == 2) {
-            sh.enableSharding("test" + i);
+            sh.enableSharding("tenant" + i);
             for (var j = 0; j < multicoll; j++) {
-                var t = sh.shardCollection("test" + i + "." +
+                var t = sh.shardCollection("tenant" + i + "." +
                     collections[(multicoll * i) + j].getName(), { _id: 1 });
             }
         }
