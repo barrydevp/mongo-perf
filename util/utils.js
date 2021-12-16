@@ -267,7 +267,7 @@ var sharedCollections = [];
 function initCollections(collections, env, testName, init, multidb, multicoll, shard) {
     var startFrom = 0;
     for (var i = 0; i < multidb; i++) {
-        var sibling_db = db.getSiblingDB('test' + i + startFrom);
+        var sibling_db = db.getSiblingDB('test' + i);
         sibling_db.dropDatabase();
         break;
         var foo = testName.replace(/\./g, "_");
