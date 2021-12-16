@@ -265,7 +265,7 @@ function CommandTracer(testName, options) {
 
 var sharedCollections = [];
 function initCollections(collections, env, testName, init, multidb, multicoll, shard) {
-    var startFrom = 100;
+    var startFrom = 0;
     for (var i = 0; i < multidb; i++) {
         var sibling_db = db.getSiblingDB('test' + i + startFrom);
         sibling_db.dropDatabase();
