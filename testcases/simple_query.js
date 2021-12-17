@@ -18,6 +18,9 @@ if (typeof(tests) !== "object") {
      * @param {Object} collectionOptions - Options to use for view/collection creation.
      */
     function collectionPopulator(isView, nDocs, indexes, docGenerator, collectionOptions) {
+        return function() {
+
+        }
         return function(collectionOrView) {
             Random.setRandomSeed(258);
 
@@ -31,7 +34,7 @@ if (typeof(tests) !== "object") {
                 var viewName = collectionOrView.getName();
                 var collectionName = viewName + "_BackingCollection";
                 collection = db.getCollection(collectionName);
-                collection.drop();
+                // collection.drop();
 
                 var viewCreationSpec = {create: viewName, viewOn: collectionName};
                 assert.commandWorked(
@@ -88,7 +91,7 @@ if (typeof(tests) !== "object") {
             pre: collectionPopulator(
                 !isView, options.nDocs, indexes, options.docs, options.collectionOptions),
             post: function(collection) {
-                collection.drop();
+                // collection.drop();
             },
             ops: [options.op]
         });
@@ -115,7 +118,7 @@ if (typeof(tests) !== "object") {
             pre: collectionPopulator(
                 !isView, options.nDocs, indexes, options.docs, options.collectionOptions),
             post: function(collection) {
-                collection.drop();
+                // collection.drop();
             },
             ops: [rewriteQueryOpAsAgg(options.op)]
         });
@@ -145,16 +148,16 @@ if (typeof(tests) !== "object") {
         tests.push({
             tags: ["regression", "query_large_dataset"].concat(tags),
             name: "Queries." + options.name,
-            generateData: options.generateData ||
-                function(collection) {
-                    Random.setRandomSeed(258);
-                    collection.drop();
-                    var bulkop = collection.initializeUnorderedBulkOp();
-                    for (var i = 0; i < nDocs; i++) {
-                        bulkop.insert(options.docGenerator(i));
-                    }
-                    bulkop.execute();
-                },
+            // generateData: options.generateData ||
+            //     function(collection) {
+            //         Random.setRandomSeed(258);
+            //         // collection.drop();
+            //         var bulkop = collection.initializeUnorderedBulkOp();
+            //         for (var i = 0; i < nDocs; i++) {
+            //             bulkop.insert(options.docGenerator(i));
+            //         }
+            //         bulkop.execute();
+            //     },
             pre: options.pre || function (collection) {},
             post: options.post || function(collection) {},
             ops: ("op" in options) ? [options.op] : [{op: "find", query: options.query}],
