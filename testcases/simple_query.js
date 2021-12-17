@@ -18,9 +18,6 @@ if (typeof(tests) !== "object") {
      * @param {Object} collectionOptions - Options to use for view/collection creation.
      */
     function collectionPopulator(isView, nDocs, indexes, docGenerator, collectionOptions) {
-        return function() {
-
-        }
         return function(collectionOrView) {
             Random.setRandomSeed(258);
 
@@ -148,16 +145,16 @@ if (typeof(tests) !== "object") {
         tests.push({
             tags: ["regression", "query_large_dataset"].concat(tags),
             name: "Queries." + options.name,
-            // generateData: options.generateData ||
-            //     function(collection) {
-            //         Random.setRandomSeed(258);
-            //         // collection.drop();
-            //         var bulkop = collection.initializeUnorderedBulkOp();
-            //         for (var i = 0; i < nDocs; i++) {
-            //             bulkop.insert(options.docGenerator(i));
-            //         }
-            //         bulkop.execute();
-            //     },
+            generateData: options.generateData ||
+                function(collection) {
+                    Random.setRandomSeed(258);
+                    // collection.drop();
+                    var bulkop = collection.initializeUnorderedBulkOp();
+                    for (var i = 0; i < nDocs; i++) {
+                        bulkop.insert(options.docGenerator(i));
+                    }
+                    bulkop.execute();
+                },
             pre: options.pre || function (collection) {},
             post: options.post || function(collection) {},
             ops: ("op" in options) ? [options.op] : [{op: "find", query: options.query}],
